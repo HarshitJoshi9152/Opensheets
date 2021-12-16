@@ -1,6 +1,6 @@
 
 CC=gcc
-CFLAGS=-Wall
+CFLAGS=-Wall -ggdb
 
 compile: ./src/main.c ./src/helper.h
 	rm build -rf && mkdir build/

@@ -1,9 +1,3 @@
-nice
-new line 
-nice s
-wowdas
-sdkj
-sadkuj
-
-
-sadjin
+A, B, C, D
+nice, good1, good2, good3
+wow, good !, k2, k3
