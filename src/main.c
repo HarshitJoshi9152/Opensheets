@@ -21,6 +21,12 @@ typedef struct sheetobject
     char *grid[SIZE][SIZE]; // rows that would contains cells (columns)
 } SheetObject;
 
+
+void freeSheet(SheetObject sheet) {
+    free(*sheet.headers);
+    free(**sheet.grid);
+}
+
 // this MUTATES THE CHAR* DATA 
 SheetObject parseSheet(char *data) {
 
@@ -28,7 +34,7 @@ SheetObject parseSheet(char *data) {
 
     // parsing the headers? to get the on of columns ig
     char firstline[SIZE];
-    sscanf(data, "%SIZE[^\n]%*c", firstline); // reading the first line
+    sscanf(data, "%50[^\n]%*c", firstline); // reading the first line
 
     char *colHeader = strtok(firstline, ",");
 
@@ -131,12 +137,14 @@ int main(int argc, char *argv[])
     if (access(input_file, R_OK) != 0) exit_program("Input File Inaccessible\n");
 
     char *file_content = readFromFile(input_file); // we need to free it since its malloc allocated
-    //printf("file_content = \n%s", file_content);
-    SheetObject sheet = parseSheet(file_content);
-    printf("%s\n", sheet.grid[1][2]);
 
-    free(file_content);
-    // so the file should be a csv right ?
+    SheetObject sheet = parseSheet(file_content);
+    free(file_content); 
+
+
+    printf("%s\n", sheet.grid[1][2]);
+    freeSheet(sheet);
+
     return 0;
 }
  
