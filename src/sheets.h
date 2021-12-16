@@ -1,3 +1,4 @@
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,6 +6,8 @@
 #include <assert.h>
 
 #define SIZE 50
+
+typedef enum {false, true} bool;
 typedef struct sheetobject
 {
     long long rowsCount;
@@ -17,6 +20,23 @@ typedef struct sheetobject
 void freeSheet(SheetObject sheet) {
     free(*sheet.headers);
     free(**sheet.grid);
+}
+
+void printCell(SheetObject sheet, int r, int c)
+{
+    printf("%s\n", sheet.grid[r][c]);
+}
+
+void printSheet(SheetObject sheet)
+{
+    for (int r = 0; r < sheet.rowsCount; ++r)
+    {
+        for (int c = 0; c < sheet.colsCount; ++c)
+        {
+            printf("\"%s\" ", sheet.grid[r][c]);
+        }
+        printf("\n");
+    }
 }
 
 // this MUTATES THE CHAR* DATA 
@@ -43,9 +63,6 @@ SheetObject parseSheet(char *data) {
 
     line = strtok(data, "\n"); 
 
-    // lines[lineCount] = malloc(strlen(line) + 1); // we dont want the first line its the header !
-    // strcpy(lines[lineCount++], line);
-
     // reading the rest of the lines.
     while((line = strtok(0, "\n"))) {
 
@@ -59,6 +76,9 @@ SheetObject parseSheet(char *data) {
         for (int charCount = 0; charCount < strlen(line); charCount++)
         {
             char letter = line[charCount];
+            if (letter != ',')
+                buffer[bufferlen++] = letter;
+
             if (letter == ',' || charCount == strlen(line) - 1) // coz [1,2,3] elms = 3 ,(s) = 2
             {
                 // add to list of cells
@@ -66,9 +86,7 @@ SheetObject parseSheet(char *data) {
                 strcpy(cells[cellsFound++], buffer);
                 // reset buffer
                 bufferlen = 0;
-                memset(buffer, 0, bufferlen);
-            } else {
-                buffer[bufferlen++] = letter;
+                memset(buffer, 0, SIZE);
             }
         }
 

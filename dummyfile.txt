@@ -1,3 +1,5 @@
 A, B, C, D
 nice, good1, good2, good3
 wow, good !, k2, k3
+fix, in, parseSheet, MAJOR,
+added, printsheets, printcell, better makefile

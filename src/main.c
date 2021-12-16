@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
     SheetObject sheet = parseSheet(file_content);
     free(file_content); 
 
-
-    printf("%s\n", sheet.grid[1][2]);
+    printSheet(sheet);
+    // printCell(sheet, 1, 2);
     freeSheet(sheet);
 
     return 0;
