@@ -27,13 +27,22 @@ void printCell(SheetObject sheet, int r, int c)
     printf("%s\n", sheet.grid[r][c]);
 }
 
+// todo: implement table with border.
 void printSheet(SheetObject sheet)
 {
+    printf("    "); // padding 4 spaces
+    // printing the headers
+    for (int i = 0; i < sheet.colsCount; ++i)
+        printf("%s, ", sheet.headers[i]);
+    printf("\n");
+
+    // printing the rows
     for (int r = 0; r < sheet.rowsCount; ++r)
     {
+        printf("%d   ", r); // row numbering
         for (int c = 0; c < sheet.colsCount; ++c)
         {
-            printf("\"%s\" ", sheet.grid[r][c]);
+            printf("%s, ", sheet.grid[r][c]);
         }
         printf("\n");
     }
@@ -45,7 +54,7 @@ SheetObject parseSheet(char *data) {
     SheetObject sheet = {0};
 
     // parsing the headers? to get the on of columns ig
-    char firstline[SIZE];
+    char firstline[SIZE] = "";
     sscanf(data, "%50[^\n]%*c", firstline); // reading the first line
 
     char *colHeader = strtok(firstline, ",");
@@ -89,7 +98,7 @@ SheetObject parseSheet(char *data) {
             }
         }
 
-        assert(cellsFound == sheet.colsCount);
+        assert(cellsFound == sheet.colsCount && "UNEQUAL CELLS");
         // can we add the cell to sheet struct directly ??? ig we can lol
         memcpy(sheet.grid[lineCount], cells, cellsFound * sizeof(cells[0]));
         lineCount++;
