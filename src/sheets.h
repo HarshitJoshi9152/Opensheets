@@ -67,9 +67,8 @@ SheetObject parseSheet(char *data) {
     while((line = strtok(0, "\n"))) {
 
         // looping over line to find the separate cells 
-        char *cells[SIZE];
-
-        char buffer[SIZE]; // this is how long a cell can be.
+        char *cells[SIZE] = {0};
+        char buffer[SIZE] = {0}; // this is how long a cell can be.
         int bufferlen = 0;
         int cellsFound = 0;
 
