@@ -6,6 +6,8 @@
 #include <assert.h>
 
 #define SIZE 50
+#define MAX_FUNCTION_NAME_LEN 4
+#define MIN_FUNCTION_NAME_LEN 3
 
 typedef enum {false, true} bool;
 typedef struct sheetobject
@@ -16,6 +18,23 @@ typedef struct sheetobject
     char *grid[SIZE][SIZE]; // rows that would contains cells (columns)
 } SheetObject;
 
+typedef enum {
+    NO_MATCH,
+    SUM,
+    SUB,
+    MUL,
+    DIV,
+    DATE,
+} Function;
+
+const char* FunctionStrings[] = {
+    [NO_MATCH] = "NO_MATCH",
+    [SUM] = "SUM",
+    [SUB] = "SUB",
+    [MUL] = "MUL",
+    [DIV] = "DIV",
+    [DATE] = "DATE",
+};
 
 void freeSheet(SheetObject sheet) {
     free(*sheet.headers);
@@ -46,6 +65,80 @@ void printSheet(SheetObject sheet)
         }
         printf("\n");
     }
+}
+
+Function findFunctionMatch(const char *bufferString)
+{
+    /*
+    sub the MAX_FUNCTION_NAME_LEN from the strlen to get the offset
+    from which to check if the rest of the string matches any function names
+
+       0123456789
+    ex cellValue3SUM            offset = strlen(cellValue3SUM) - MAX_FUNCTION_NAME_LEN
+                ^                      = 13 - 4 = 9
+                |               end = 13 - MIN_FUNCTION_NAME_LEN = 13 - 3 = 10
+
+    the code will try to match "3SUM" to all the function but no match will be found.
+    so the offset will be incremented and the new resulting string "SUM" will be checked
+    for match against all the functions, when a match is found the match index is returned.
+    */
+
+    int len = strlen(bufferString);
+    int offset = len - MAX_FUNCTION_NAME_LEN;
+    int end = len - MIN_FUNCTION_NAME_LEN;
+    int func_count = sizeof(FunctionStrings)/sizeof(FunctionStrings[0]);
+
+    if (offset < 0) return NO_MATCH; // we dont want a negative index
+
+    for (offset; offset <= end; ++offset)
+    {
+        for (int f_i = 0; f_i < func_count; f_i++)
+        {
+            int match = !strcmp(bufferString + offset, FunctionStrings[f_i]);
+            if (match) return f_i;
+            // i can just return f_i because enums get reduced to ints anyways right !
+        }
+    }
+    return NO_MATCH;
+}
+
+char* evaluateCell(char* cell) {
+    int len_cell = strlen(cell);
+    char buffer[SIZE] = {0};
+    int bufferCounter = 0;
+
+    for (int i=0; i < len_cell; ++i)
+    {
+        buffer[bufferCounter++] = cell[i];
+
+        Function bufferMatch = findFunctionMatch(buffer);
+
+        switch (bufferMatch)
+        {
+            case NO_MATCH:
+                // add the expressions on the left and right
+                continue;
+
+            default:
+                printf("<bufferMatch %s>\n", FunctionStrings[bufferMatch]);
+                break;
+        }
+    }
+    return cell;
+}
+
+SheetObject evaluateSheet(SheetObject sheet)
+{
+    // https://blog.logrocket.com/learn-these-keyboard-shortcuts-to-become-a-vs-code-ninja/
+    for (int r = 0; r < sheet.rowsCount; ++r)
+    {
+        for (int c = 0; c < sheet.colsCount; ++c)
+        {
+            char *cell = sheet.grid[r][c];
+            evaluateCell(cell);
+        }
+    }
+    return sheet;
 }
 
 // this MUTATES THE CHAR* DATA 

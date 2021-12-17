@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
     free(file_content); 
 
     printSheet(sheet);
+    evaluateSheet(sheet);
     freeSheet(sheet);
 
     return 0;

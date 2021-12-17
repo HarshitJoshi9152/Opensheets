@@ -1,5 +1,5 @@
 names, A, B, C, D
-name1, nice, good1, good2, good3
-name2, wow, good !, k2, k3
+name1, n+ice, g+ood1, good2, good3,
+name2, wow, good !, k2, k3SUM(40 50),
 name3, fix, in, parseSheet, MAJOR,
-name4, added, printsheets, printcell, better makefile
+name4, added, printsheets, printcell, better+makefile,
