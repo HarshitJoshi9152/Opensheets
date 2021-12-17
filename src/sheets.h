@@ -5,38 +5,11 @@
 #include <string.h>
 #include <assert.h>
 
-#define SIZE 50
-#define MAX_FUNCTION_NAME_LEN 4
-#define MIN_FUNCTION_NAME_LEN 3
+#include "types.h"
+#include "functions.h"
 
-typedef enum {false, true} bool;
-typedef struct sheetobject
+void freeSheet(SheetObject sheet)
 {
-    long long rowsCount;
-    long long colsCount;
-    char *headers[SIZE]; // col headers
-    char *grid[SIZE][SIZE]; // rows that would contains cells (columns)
-} SheetObject;
-
-typedef enum {
-    NO_MATCH,
-    SUM,
-    SUB,
-    MUL,
-    DIV,
-    DATE,
-} Function;
-
-const char* FunctionStrings[] = {
-    [NO_MATCH] = "NO_MATCH",
-    [SUM] = "SUM",
-    [SUB] = "SUB",
-    [MUL] = "MUL",
-    [DIV] = "DIV",
-    [DATE] = "DATE",
-};
-
-void freeSheet(SheetObject sheet) {
     free(*sheet.headers);
     free(**sheet.grid);
 }
@@ -67,48 +40,15 @@ void printSheet(SheetObject sheet)
     }
 }
 
-Function findFunctionMatch(const char *bufferString)
+char *evaluateCell(char *cell)
 {
-    /*
-    sub the MAX_FUNCTION_NAME_LEN from the strlen to get the offset
-    from which to check if the rest of the string matches any function names
-
-       0123456789
-    ex cellValue3SUM            offset = strlen(cellValue3SUM) - MAX_FUNCTION_NAME_LEN
-                ^                      = 13 - 4 = 9
-                |               end = 13 - MIN_FUNCTION_NAME_LEN = 13 - 3 = 10
-
-    the code will try to match "3SUM" to all the function but no match will be found.
-    so the offset will be incremented and the new resulting string "SUM" will be checked
-    for match against all the functions, when a match is found the match index is returned.
-    */
-
-    int len = strlen(bufferString);
-    int offset = len - MAX_FUNCTION_NAME_LEN;
-    int end = len - MIN_FUNCTION_NAME_LEN;
-    int func_count = sizeof(FunctionStrings)/sizeof(FunctionStrings[0]);
-
-    if (offset < 0) return NO_MATCH; // we dont want a negative index
-
-    for (offset; offset <= end; ++offset)
-    {
-        for (int f_i = 0; f_i < func_count; f_i++)
-        {
-            int match = !strcmp(bufferString + offset, FunctionStrings[f_i]);
-            if (match) return f_i;
-            // i can just return f_i because enums get reduced to ints anyways right !
-        }
-    }
-    return NO_MATCH;
-}
-
-char* evaluateCell(char* cell) {
     int len_cell = strlen(cell);
     char buffer[SIZE] = {0};
     int bufferCounter = 0;
 
-    for (int i=0; i < len_cell; ++i)
+    for (int i = 0; i < len_cell; ++i)
     {
+        // i is the offset. the current character added position.
         buffer[bufferCounter++] = cell[i];
 
         Function bufferMatch = findFunctionMatch(buffer);
@@ -118,6 +58,19 @@ char* evaluateCell(char* cell) {
             case NO_MATCH:
                 // add the expressions on the left and right
                 continue;
+
+            case DATE:
+            {
+                char *time = date();
+                time[strlen(time) - 1] =  '\x00'; //coz we dont want the newline at the end lmao.
+
+                char *args = getArgsString(cell, i);
+
+                // rewriteCellAt(cell, from, till, new_text);
+                rewriteCell(cell, i - 4 + 1, i + strlen(args), time);   //`date` = 4
+                free(args); // should we free the text in rewriteCell ?
+                break;
+            }
 
             default:
                 printf("<bufferMatch %s>\n", FunctionStrings[bufferMatch]);
@@ -141,8 +94,9 @@ SheetObject evaluateSheet(SheetObject sheet)
     return sheet;
 }
 
-// this MUTATES THE CHAR* DATA 
-SheetObject parseSheet(char *data) {
+// this MUTATES THE CHAR* DATA
+SheetObject parseSheet(char *data)
+{
 
     SheetObject sheet = {0};
 
@@ -152,23 +106,24 @@ SheetObject parseSheet(char *data) {
 
     char *colHeader = strtok(firstline, ",");
 
-    do {
+    do
+    {
         sheet.headers[sheet.colsCount] = malloc(strlen(colHeader) + 1);
         strcpy(sheet.headers[sheet.colsCount++], colHeader);
-    }
-    while((colHeader = strtok(NULL, ",")));
+    } while ((colHeader = strtok(NULL, ",")));
 
     // parsing the rest of the rows
 
     char *line;
     int lineCount = 0;
 
-    line = strtok(data, "\n"); 
+    line = strtok(data, "\n");
 
     // reading the rest of the lines.
-    while((line = strtok(0, "\n"))) {
+    while ((line = strtok(0, "\n")))
+    {
 
-        // looping over line to find the separate cells 
+        // looping over line to find the separate cells
         char *cells[SIZE] = {0};
         char buffer[SIZE] = {0}; // this is how long a cell can be.
         int bufferlen = 0;

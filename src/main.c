@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
     SheetObject sheet = parseSheet(file_content);
     free(file_content); 
 
+    sheet = evaluateSheet(sheet);
     printSheet(sheet);
-    evaluateSheet(sheet);
     freeSheet(sheet);
 
     return 0;

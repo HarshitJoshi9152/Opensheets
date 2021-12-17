@@ -9,6 +9,7 @@
 // print a msg to stderr stream and exit with EXIT_FAILURE
 void exit_program(char *error_string)
 {
+    // TODO: first we need to free all the resources
     fputs(error_string, stderr);
     exit(EXIT_FAILURE);
 }
