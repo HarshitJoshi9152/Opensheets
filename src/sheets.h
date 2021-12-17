@@ -11,7 +11,14 @@
 void freeSheet(SheetObject sheet)
 {
     free(*sheet.headers);
-    free(**sheet.grid);
+
+    for (int r = 0; r < sheet.rowsCount; ++r)
+    {
+        for (int c = 0; c < sheet.colsCount; ++c)
+        {
+            free(sheet.grid[r][c]);
+        }
+    }
 }
 
 void printCell(SheetObject sheet, int r, int c)

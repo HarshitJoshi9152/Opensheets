@@ -18,6 +18,7 @@ void rewriteCell(char* cell, int from, int till, char* new_text)
 
     int cell_len = strlen(cell);
     int new_text_len = strlen(new_text);
+    
     char* buffer = malloc(cell_len - (till - from + 1) + strlen(new_text) + 1); // +1 for the NULL character
     strncpy(buffer, cell, from);
     strcpy(buffer+from, new_text);
