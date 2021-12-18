@@ -66,16 +66,55 @@ char *evaluateCell(char *cell)
                 // add the expressions on the left and right
                 continue;
 
+            case SUB:
+            {
+                char *args = getArgsString(cell, i);
+                char *args_cpy = malloc(strlen(args) + 1);  // we need to have 2 strings because `sum` mutates the `args` string.
+                strcpy(args_cpy, args);
+
+                char *s = sub(args_cpy);
+                free(args_cpy);
+
+                rewriteCell(cell, i - 3 + 1, i + strlen(args), s);   //`sum` = 3
+                free(args); // should we free the text in rewriteCell ?
+
+                // reset the buffer
+                memset(buffer, 0, SIZE);
+                bufferCounter = 0;
+                break;
+            }
+            case MUL:
+            {
+                char *args = getArgsString(cell, i);
+                char *args_cpy = malloc(strlen(args) + 1);  // we need to have 2 strings because `MUL` mutates the `args` string.
+                strcpy(args_cpy, args);
+
+                char *s = mul(args_cpy);
+                free(args_cpy);
+
+                rewriteCell(cell, i - 3 + 1, i + strlen(args), s);   //`MUL` = 3
+                free(args); // should we free the text in rewriteCell ?
+
+                // reset the buffer
+                memset(buffer, 0, SIZE);
+                bufferCounter = 0;
+                break;
+            }
             case SUM:
             {
                 char *args = getArgsString(cell, i);
                 char *args_cpy = malloc(strlen(args) + 1);  // we need to have 2 strings because `sum` mutates the `args` string.
                 strcpy(args_cpy, args);
+
                 char *s = sum(args_cpy);
                 free(args_cpy);
 
                 rewriteCell(cell, i - 3 + 1, i + strlen(args), s);   //`sum` = 3
                 free(args); // should we free the text in rewriteCell ?
+
+                // reset the buffer
+                memset(buffer, 0, SIZE);
+                bufferCounter = 0;
                 break;
             }
             case DATE:
@@ -85,9 +124,12 @@ char *evaluateCell(char *cell)
 
                 char *args = getArgsString(cell, i);
 
-                // rewriteCellAt(cell, from, till, new_text);
                 rewriteCell(cell, i - 4 + 1, i + strlen(args), time);   //`date` = 4
                 free(args); // should we free the text in rewriteCell ?
+
+                // reset the buffer
+                memset(buffer, 0, SIZE);
+                bufferCounter = 0;
                 break;
             }
 

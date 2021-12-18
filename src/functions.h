@@ -89,33 +89,51 @@ char* sum(char *args)
     int args_count = 0;
     int* argv = parseArgsAsInts(args, &args_count);
 
-    int s = 0;
+    int result = 0;
     for (int i = 0; i < args_count; i++) {
-        s += argv[i];
+        result += argv[i];
     }
     free(argv);
 
     char *str = malloc(10);
-    sprintf(str, "%d", s);
+    sprintf(str, "%d", result);
 
     return str;
 }
 
-// char* sub(char *args)
-// {
-//     int args_count = 0;
-//     int* argv = parseArgsAsInts(args, &args_count);
-//     printf("<args_count = %d>", args_count);
-//     free(argv);
-// }
+char* sub(char *args)
+{
+    int args_count = 0;
+    int* argv = parseArgsAsInts(args, &args_count);
 
-// char* mul(char *args)
-// {
-//     int args_count = 0;
-//     int* argv = parseArgsAsInts(args, &args_count);
-//     printf("<args_count = %d>", args_count);
-//     free(argv);
-// }
+    int result = argv[0];
+    for (int i = 1; i < args_count; i++) {
+        result -= argv[i];
+    }
+    free(argv);
+
+    char *str = malloc(10);
+    sprintf(str, "%d", result);
+
+    return str;
+}
+
+char* mul(char *args)
+{
+    int args_count = 0;
+    int* argv = parseArgsAsInts(args, &args_count);
+
+    int result = 1;
+    for (int i = 0; i < args_count; i++) {
+        result *= argv[i];
+    }
+    free(argv);
+
+    char *str = malloc(10);
+    sprintf(str, "%d", result);
+
+    return str;
+}
 
 // char* divide(char *args)
 // {
