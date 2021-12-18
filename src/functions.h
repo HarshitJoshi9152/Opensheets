@@ -159,6 +159,13 @@ char* date()
     return asctime(time);
 }
 
+char* gmdate()
+{
+    time_t t = time(NULL);
+    struct tm *time = gmtime(&t);
+    return asctime(time);
+}
+
 
 Function findFunctionMatch(const char *bufferString)
 {
