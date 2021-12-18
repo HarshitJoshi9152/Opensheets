@@ -2,5 +2,5 @@ names, A, B, C, D
 name1, n+ice, g+ood1, good2, good3
 name2, wow, good !, k2, k3SUM(40 50)
 name3SUM(100 2332), fix, in, parseSheetSUM(40 10), MAJORDATE(value)NEWVALUE
-name4, added, printsheets, printcell, better+makefile,
+name4, added, printsheets, printcell, DIV(40 2 2),
 name4, SUM(213 321), SUB(100 43), SUB(1000 231), MUL(20 40 213),

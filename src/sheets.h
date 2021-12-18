@@ -100,6 +100,23 @@ char *evaluateCell(char *cell)
                 bufferCounter = 0;
                 break;
             }
+            case DIV:
+            {
+                char *args = getArgsString(cell, i);
+                char *args_cpy = malloc(strlen(args) + 1);  // we need to have 2 strings because `DIV` mutates the `args` string.
+                strcpy(args_cpy, args);
+
+                char *s = divide(args_cpy);
+                free(args_cpy);
+
+                rewriteCell(cell, i - 3 + 1, i + strlen(args), s);   //`DIV` = 3
+                free(args); // should we free the text in rewriteCell ?
+
+                // reset the buffer
+                memset(buffer, 0, SIZE);
+                bufferCounter = 0;
+                break;
+            }
             case SUM:
             {
                 char *args = getArgsString(cell, i);

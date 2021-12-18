@@ -135,13 +135,22 @@ char* mul(char *args)
     return str;
 }
 
-// char* divide(char *args)
-// {
-//     int args_count = 0;
-//     int* argv = parseArgsAsInts(args, &args_count);
-//     printf("<args_count = %d>", args_count);
-//     free(argv);
-// }
+char* divide(char *args)
+{
+    int args_count = 0;
+    int* argv = parseArgsAsInts(args, &args_count);
+
+    int result = argv[0];
+    for (int i = 1; i < args_count; i++) {
+        result = result / argv[i];
+    }
+    free(argv);
+
+    char *str = malloc(10);
+    sprintf(str, "%d", result);
+
+    return str;
+}
 
 char* date()
 {
@@ -185,3 +194,9 @@ Function findFunctionMatch(const char *bufferString)
     }
     return NO_MATCH;
 }
+
+/**
+ * TODO
+ * 1. add nestability to functions.
+ * 
+ */
