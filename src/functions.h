@@ -1,24 +1,28 @@
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 #include "types.h"
 
+#define MAX_FUNCTION_NAME_LEN 4
+#define MIN_FUNCTION_NAME_LEN 3
+#define DELIMITER " "
+#define ARGS_LIMIT 10
 
 char* sum(char *args);
 char* sub(char *args);
 char* mul(char *args);
-// char* div(char *args);
+char* divide(char *args);
 char* date();
 
 Function findFunctionMatch(const char *bufferString);
-// char* getArgsString(char *cell, int index);
 
 void rewriteCell(char* cell, int from, int till, char* new_text)
 {
 
     int cell_len = strlen(cell);
     int new_text_len = strlen(new_text);
-    
+
     char* buffer = malloc(cell_len - (till - from + 1) + strlen(new_text) + 1); // +1 for the NULL character
     strncpy(buffer, cell, from);
     strcpy(buffer+from, new_text);
@@ -55,33 +59,77 @@ char* getArgsString(char *cell, int start_index) {
     return args;
 }
 
-// char* sum(char *args)
-// {
-//     parseArgsAsInt(args);
-// }
+int* parseArgsAsInts(char* args, int *args_count)
+{
+    args[strlen(args) - 1] = '\x00';  // the last char is ')' and that wont be parsed by `atoi` function
+
+    int *argv = calloc(ARGS_LIMIT, sizeof(int));
+    memset(argv, 0, ARGS_LIMIT * sizeof(int));
+
+    int argv_count = 0; // could we remove this variable because args_count would always be 0 ?
+
+    char* arg = strtok(args, DELIMITER);
+    argv[argv_count++] = atoi(arg+1); // arg + 1 becase the arg char is `(` and the last is `)`;
+
+    while((arg = strtok(NULL, DELIMITER)))
+    {
+        int num = atoi(arg);
+        if (num == 0) exit_program("Could Not Parse argument as Number");
+        // argv[*(args_count)++] = num; num); // why does this not wwork ?
+        argv[argv_count++] = num;
+    }
+
+    *args_count = argv_count;
+    return argv;
+}
+
+
+char* sum(char *args)
+{
+    int args_count = 0;
+    int* argv = parseArgsAsInts(args, &args_count);
+
+    int s = 0;
+    for (int i = 0; i < args_count; i++) {
+        s += argv[i];
+    }
+    free(argv);
+
+    char *str = malloc(10);
+    sprintf(str, "%d", s);
+
+    return str;
+}
 
 // char* sub(char *args)
 // {
-//     parseArgsAsInt(args);
+//     int args_count = 0;
+//     int* argv = parseArgsAsInts(args, &args_count);
+//     printf("<args_count = %d>", args_count);
+//     free(argv);
 // }
 
 // char* mul(char *args)
 // {
-//     parseArgsAsInt(args);
+//     int args_count = 0;
+//     int* argv = parseArgsAsInts(args, &args_count);
+//     printf("<args_count = %d>", args_count);
+//     free(argv);
 // }
 
-// char* div(char *args)
+// char* divide(char *args)
 // {
-//     parseArgsAsInt(args);
+//     int args_count = 0;
+//     int* argv = parseArgsAsInts(args, &args_count);
+//     printf("<args_count = %d>", args_count);
+//     free(argv);
 // }
 
 char* date()
 {
-    // struct tm  = time(NULL);
     time_t t = time(NULL);
     struct tm *time = localtime(&t);
     return asctime(time);
-    // ctime();
 }
 
 
@@ -108,7 +156,7 @@ Function findFunctionMatch(const char *bufferString)
 
     if (offset < 0) return NO_MATCH; // we dont want a negative index
 
-    for (offset; offset <= end; ++offset)
+    for (; offset <= end; ++offset)
     {
         for (int f_i = 0; f_i < func_count; f_i++)
         {

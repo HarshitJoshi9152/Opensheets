@@ -1,8 +1,6 @@
 #pragma once
 
 #define SIZE 50
-#define MAX_FUNCTION_NAME_LEN 4
-#define MIN_FUNCTION_NAME_LEN 3
 
 typedef enum {false, true} bool;
 typedef struct sheetobject
